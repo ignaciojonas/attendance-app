@@ -1,23 +1,56 @@
 <div class="container">
-    <h1>
-      Bienvenidos a la App de asistencia de Web
-    </h1>
-    <div class="alert alert-warning" *ngIf="alreadyPresent">
-      <strong>Ya tenes asistencia para este día!</strong>
+  <div class="row">
+    <div class="col-md-12">
+      <h1>
+        Bienvenidos a la App de asistencia de Web
+      </h1>
     </div>
-    <div class="alert alert-success" *ngIf="saveSuccessful">
-      <strong>La asistencia se grabo correctamente</strong>
-    </div>
-    <ngui-map zoom="13" *ngIf="saveSuccessful">
-      <marker [geoFallbackPosition]="[-37.3171663, -59.1239526]" animation="Animation.BOUNCE"></marker>
-    </ngui-map>
-    <form (ngSubmit)="onSubmit()" >
-      <div class="form-group">
-        <label for="name">Alumno</label>
-        <select class="form-control" name="name" [(ngModel)]="selectedStudent" required>
-          <option *ngFor="let student of students | async" [ngValue]="student.$key">{{student.name + ' - ' + student.lu}}</option>
-        </select>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+
+      <div class="alert alert-warning" *ngIf="alreadyPresent">
+        <strong>Ya tenes asistencia para este día!</strong>
       </div>
-      <button type="submit" class="btn btn-success" [disabled]="this.location == undefined">Presente</button>
-    </form>
+      <div class="alert alert-success" *ngIf="saveSuccessful">
+        <strong>La asistencia se grabó correctamente</strong>
+      </div>
+      <div class="alert alert-success" *ngIf="saveUserSuccessful">
+        <strong>El alumno se grabó correctamente</strong>
+      </div>
+      <ngui-map zoom="13" *ngIf="saveSuccessful">
+        <marker [geoFallbackPosition]="[-37.3171663, -59.1239526]" animation="Animation.BOUNCE"></marker>
+      </ngui-map>
+
+        <form (ngSubmit)="onSubmit()" >
+          <div class="form-group">
+            <label for="name">Alumno: </label>
+            <select class="form-control" name="name" [(ngModel)]="selectedStudent" required>
+              <option *ngFor="let student of students | async | orderBy: 'name'" [ngValue]="student.$key">{{student.name + ' - ' + student.lu}}</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-success" [disabled]="this.location == undefined">Presente</button>
+        </form>
+
+    </div>
+
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">Agregate si aun no estas en la lista</div>
+      <div class="panel-body">
+        <form (ngSubmit)="addUser()" >
+          <div class="form-group">
+            <label for="name">Apellido y Nombre: </label>
+            <input type="text" name="name" id="name" [(ngModel)]="name" placeholder="Perez, Juan" required>
+          </div>
+          <div class="form-group">
+            <label for="lu">Libreta Universitaria: </label>
+            <input type="number" name="lu" id="lu" [(ngModel)]="lu" placeholder="12345" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Agregar</button>
+        </form>
+      </div>
+    </div>
+</div>
 </div>

@@ -13,6 +13,9 @@ export class AppComponent {
   public date: string;
   public alreadyPresent: boolean = false;
   public saveSuccessful: boolean = false;
+  public saveUserSuccessful: boolean = false;
+  public name: string = '';
+  public lu: number;
 
   constructor(private db: AngularFireDatabase) {
      this.students = db.list('/Students');
@@ -70,4 +73,14 @@ export class AppComponent {
       this.alreadyPresent = true;
     }
   }
+
+  addUser(){
+     let students = this.db.list(`/Students`);
+      students.push({ "name": this.name, "lu": this.lu})
+      this.name = '';
+      this.lu = undefined;
+      this.saveUserSuccessful = true;
+  }
+
+
 }

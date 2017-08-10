@@ -4,6 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { NguiMapModule} from '@ngui/map';
+import { Ng2OrderModule } from 'ng2-order-pipe';
 
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
@@ -17,7 +18,8 @@ import { environment } from '../environments/environment';
     FormsModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
-    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?key=AIzaSyCCseK4WpN1wFLJwo5psZ1QPCCM16ahwWo'})
+    Ng2OrderModule,
+    NguiMapModule.forRoot(environment.googlemaps)
   ],
   providers: [],
   bootstrap: [AppComponent]
