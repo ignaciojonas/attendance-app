@@ -23,10 +23,15 @@ export class AppComponent {
      this.students.subscribe(students=>{
        this.studentsInClass = [];
        students.forEach(student => {
-              if(student.attended)
-               if(this.isInClass(student.attended)){
-                 this.studentsInClass.push(student);
+              if(student.attended){
+                let klass = this.isInClass(student.attended);
+                if(klass){
+                 this.studentsInClass.push({
+                                            "name": student.name + ' - ' + student.lu,
+                                            "position": [klass.lat, klass.long]
+                                          });
                }
+             }
            }
          )
        });
@@ -58,24 +63,12 @@ export class AppComponent {
     return guid;
   }
 
-  listOfStudentsInClass(){
-    let studentsInClass = [];
-    this.students.forEach(students => {
-      students.forEach(student => {
-        if(this.isInClass(student.attended)){
-          studentsInClass.push(student.name);
-        }
-      });
-    });
-    return studentsInClass;
-  }
-
   isInClass(attendedClases){
-    let ret = false;
+    let ret : any;
     Object.keys(attendedClases).forEach(function(key) {
       var klass = attendedClases[key];
       if(new Date(klass.date).toDateString() == new Date().toDateString()){
-        ret = true;
+        ret = klass;
         return true;
       }
     });
