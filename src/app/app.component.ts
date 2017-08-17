@@ -8,6 +8,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 })
 export class AppComponent {
   public students: FirebaseListObservable<any[]>;
+  public studentsInClass : any[] = [];
   public selectedStudent: string;
   public location: any;
   public date: string;
@@ -15,10 +16,20 @@ export class AppComponent {
   public saveSuccessful: boolean = false;
   public saveUserSuccessful: boolean = false;
   public name: string = '';
-  public lu: number;
+  public lu: string;
 
   constructor(private db: AngularFireDatabase) {
      this.students = db.list('/Students');
+     this.students.subscribe(students=>{
+       this.studentsInClass = [];
+       students.forEach(student => {
+              if(student.attended)
+               if(this.isInClass(student.attended)){
+                 this.studentsInClass.push(student);
+               }
+           }
+         )
+       });
      this.date = new Date().toDateString();
   }
 
@@ -47,16 +58,26 @@ export class AppComponent {
     return guid;
   }
 
-  isInClass(){
-    let attendedClases = this.db.list(`/Students/${this.selectedStudent}/attended`);
-    let ret = false;
-    attendedClases.forEach(clases => {
-      clases.forEach(c => {
-        if(c.date == this.date){
-          ret = true;
-          return true;
+  listOfStudentsInClass(){
+    let studentsInClass = [];
+    this.students.forEach(students => {
+      students.forEach(student => {
+        if(this.isInClass(student.attended)){
+          studentsInClass.push(student.name);
         }
       });
+    });
+    return studentsInClass;
+  }
+
+  isInClass(attendedClases){
+    let ret = false;
+    Object.keys(attendedClases).forEach(function(key) {
+      var klass = attendedClases[key];
+      if(new Date(klass.date).toDateString() == new Date().toDateString()){
+        ret = true;
+        return true;
+      }
     });
     return ret;
   }
@@ -64,22 +85,31 @@ export class AppComponent {
   onSubmit(){
     this.saveSuccessful = false;
     this.alreadyPresent = false;
-    if(!this.isInClass()){
-       let attendedClases = this.db.list(`/Students/${this.selectedStudent}/attended`);
-       attendedClases.push({ "date": this.date, "lat": this.location.latitude, "long": this.location.longitude, "guid": this.guid() })
-       this.saveSuccessful = true;
-    }
-    else{
-      this.alreadyPresent = true;
-    }
+    this.db.list(`/Students/${this.selectedStudent}/attended`).subscribe(attended=>{
+      if(!this.isInClass(attended)){
+         this.db.list(`/Students/${this.selectedStudent}/attended`).push({ "date": Date.now(), "lat": this.location.latitude, "long": this.location.longitude, "guid": this.guid() })
+         this.saveSuccessful = true;
+      }
+      else{
+        this.alreadyPresent = true && !this.saveSuccessful;
+      }
+    });
   }
 
   addUser(){
-     let students = this.db.list(`/Students`);
+    let error = '';
+    if(this.name === undefined || this.name === '') error += "El nombre es obligatorio. ";
+    if(this.lu === undefined || this.lu === '') error += "La Libreta Universitaria es obligatoria.";
+    if(error !== ''){
+      alert(error);
+    }
+    else {
+      let students = this.db.list(`/Students`);
       students.push({ "name": this.name, "lu": this.lu})
       this.name = '';
       this.lu = undefined;
       this.saveUserSuccessful = true;
+    }
   }
 
 
